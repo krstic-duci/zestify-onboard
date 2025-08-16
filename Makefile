@@ -1,0 +1,35 @@
+PY_DIR=knowledge_base
+JS_DIR=interface
+
+.PHONY: setup dev start lint format test clean py
+
+setup:
+	cd $(PY_DIR) && uv sync --frozen
+	cd $(JS_DIR) && pnpm install
+
+dev:
+	cd $(PY_DIR) && uv run main.py &
+	cd $(JS_DIR) && pnpm dev
+
+start:
+	cd $(PY_DIR) && uv run main.py &
+	cd $(JS_DIR) && pnpm start
+
+lint:
+	cd $(PY_DIR) && uv run ruff check .
+	cd $(JS_DIR) && pnpm lint
+
+format:
+	cd $(PY_DIR) && uv run ruff format .
+	cd $(JS_DIR) && pnpm format
+
+test:
+	cd $(PY_DIR) && pytest
+	cd $(JS_DIR) && pnpm test
+
+clean:
+	cd $(PY_DIR) && rm -rf .mypy_cache .pytest_cache
+	cd $(JS_DIR) && rm -rf .next
+
+py:
+	cd $(PY_DIR) && uv run main.py

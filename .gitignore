@@ -1,0 +1,20 @@
+# Python-generated files
+__pycache__/
+.pytest_cache/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+# Virtual environments
+.venv
+.env
+.vscode/
+chroma_langchain_db/
+
+# Frontend
+.next/
+node_modules/

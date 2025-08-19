@@ -14,6 +14,8 @@ wheels/
 .env
 .vscode/
 chroma_langchain_db/
+knowledge_base/src/tmp
+knowledge_base/cleaned_examples/
 
 # Frontend
 .next/

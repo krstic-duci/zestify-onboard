@@ -1,7 +1,7 @@
 PY_DIR=knowledge_base
 JS_DIR=interface
 
-.PHONY: setup dev start lint format test clean py
+.PHONY: setup dev lint format test clean kb if
 
 setup:
 	cd $(PY_DIR) && uv sync --frozen
@@ -10,10 +10,6 @@ setup:
 dev:
 	cd $(PY_DIR) && uv run main.py &
 	cd $(JS_DIR) && pnpm dev
-
-start:
-	cd $(PY_DIR) && uv run main.py &
-	cd $(JS_DIR) && pnpm start
 
 lint:
 	cd $(PY_DIR) && uv run ruff check .
@@ -31,5 +27,8 @@ clean:
 	cd $(PY_DIR) && rm -rf .mypy_cache .pytest_cache
 	cd $(JS_DIR) && rm -rf .next
 
-py:
-	cd $(PY_DIR) && uv run main.py
+kb:
+	cd $(PY_DIR)/src
+
+if:
+	cd $(JS_DIR)

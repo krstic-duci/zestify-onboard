@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "bs4>=0.0.2",
+    "gitpython>=3.1.45",
     "google-genai>=1.30.0",
     "langchain>=0.3.27",
     "langchain-chroma>=0.2.5",
@@ -13,6 +14,7 @@ dependencies = [
     "langchain-core>=0.3.74",
     "langchain-text-splitters>=0.3.9",
     "langchain[google-genai]>=0.3.27",
+    "markdownify>=0.12.1",
 ]
 
 [dependency-groups]
@@ -26,6 +28,7 @@ line-length = 88
 lint.select = ["E", "F", "I", "B"]
 lint.ignore = ["E501"]
 cache-dir = ".ruff_cache"
+exclude = ["src/tmp/"]
 
 [tool.mypy]
 python_version = "3.13"
@@ -34,6 +37,11 @@ warn_unused_configs = true
 warn_return_any = true
 warn_unused_ignores = true
 cache_dir = ".mypy_cache"
+exclude = ["src/tmp/"]
+
+[[tool.mypy.overrides]]
+module = "markdownify"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"

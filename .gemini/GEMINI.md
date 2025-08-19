@@ -8,14 +8,14 @@ The entire technology stack is built upon free and open-source software, with th
 
 ## Phase 1: The Knowledge base Service (Python)
 
-This phase is responsible for processing the knowledge source (the GitHub repository) and preparing it for the AI. This is an offline process, executed via a local Python script.
+This phase is responsible for processing the knowledge source (the GitHub repository) and preparing it for the AI. This is an offline process (enhance in the future with some sort of GitHub actions whenever `zestify` repository is updated), executed via a local Python script.
 
 ### Technology Stack
 
 - **Orchestration:** Python with the LangChain framework.
 - **Vector Database:** ChromaDB, running locally for ease of use and persistence.
 - **Embedding Model:** Google's `text-embedding-004`, accessed through the Gemini API.
-- **Google AI lib**: Google's `google-genai` a Python free lib is to be using for Gemini API.
+- **Google AI lib**: LangChain's Google Python free lib is to be using for Gemini API.
 - **Vercel AI SDK**: Vercel's AI SDK will be used for building the chat interface and Next.js > 15.x.x
 
 ### Python Development Environment
@@ -28,8 +28,8 @@ This phase is responsible for processing the knowledge source (the GitHub reposi
 
 ### Workflow
 
-1.  **Load Data:** A Python script (`ingest.py`) will use LangChain's `GitLoader` to clone the target GitHub repository and load all relevant source files.
-2.  **Split Documents:** The loaded documents will be passed through a `RecursiveCharacterTextSplitter` in LangChain to break them into smaller, semantically coherent chunks.
+1.  **Load Data:** A Python script (`git_loader.py`) will use LangChain's `GitLoader` to clone the target GitHub repository and load all relevant source files.
+2.  **Split Documents:** The loaded documents (with `data_split.py`) will be passed through a `RecursiveCharacterTextSplitter` in LangChain to break them into smaller, semantically coherent chunks.
 3.  **Generate Embeddings:** For each text chunk, the script will call the Gemini API to generate a vector embedding.
 4.  **Store in Vector DB:** The script will store each chunk and its corresponding vector in a local ChromaDB database.
 

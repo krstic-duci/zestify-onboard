@@ -70,3 +70,7 @@ To ensure the project is easy to understand and maintain, we will adhere to the 
 - **Clear Naming:** Use descriptive and unambiguous names for variables, functions, and classes.
 - **Comments for Clarity:** Add comments to explain the "why" behind complex or non-obvious code, not just the "what."
 - **Ruff sort**: Every file MUST be sorted accorting to Ruff rules located in `pyproject.toml` file.
+
+## Misc
+
+Do NOT output any preamble, plan, task-receipt, or explanation before reading files or making edits.

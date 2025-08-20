@@ -12,9 +12,11 @@ dependencies = [
     "langchain-chroma>=0.2.5",
     "langchain-community>=0.3.27",
     "langchain-core>=0.3.74",
+    "langchain-ollama>=0.2.8",
     "langchain-text-splitters>=0.3.9",
     "langchain[google-genai]>=0.3.27",
     "markdownify>=0.12.1",
+    "ragas>=0.3.0",
 ]
 
 [dependency-groups]
@@ -38,9 +40,10 @@ warn_return_any = true
 warn_unused_ignores = true
 cache_dir = ".mypy_cache"
 exclude = ["src/tmp/"]
+disable_error_code = ["import-untyped"]
 
 [[tool.mypy.overrides]]
-module = "markdownify"
+module = ["markdownify", "ragas", "ragas.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

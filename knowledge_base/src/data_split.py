@@ -5,11 +5,13 @@ from typing import List
 from langchain_core.documents import Document
 from langchain_text_splitters import Language, RecursiveCharacterTextSplitter
 
-from src.utils.clean_document import clean_document
+from .utils.clean_document import clean_document
+from .utils.logging_config import setup_logging
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

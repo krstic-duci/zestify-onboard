@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-Model configuration for hybrid Ollama + Gemini setup.
-
-This module provides optimized model selection for different hardware configurations.
-For low-end Macs, we use local Ollama for embeddings (no API limits, faster)
-and Gemini API for LLM generation (better quality, handles quota).
-"""
-
 import logging
 import os
 
@@ -14,6 +6,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import OllamaEmbeddings
 from pydantic import SecretStr
 
+from .logging_config import setup_logging
+
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

@@ -17,6 +17,8 @@ ASTNodeWithPos = Union[
 ]
 
 
+# https://medium.com/@wshanshan/intro-to-python-ast-module-bbd22cd505f7
+# https://docs.python.org/3/library/ast.html#ast.NodeVisitor
 class PythonCodeVisitor(ast.NodeVisitor):
     """
     An AST visitor that walks through a Python source code's Abstract Syntax Tree

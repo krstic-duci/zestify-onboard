@@ -6,9 +6,12 @@ from typing import List, Optional
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
+from .utils.logging_config import setup_logging
+
 CHROMA_PERSIST_DIRECTORY = "./chroma_langchain_db"
 COLLECTION_NAME = "zestify_knowledge_base"
 
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

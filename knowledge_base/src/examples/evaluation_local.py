@@ -1,26 +1,13 @@
 #!/usr/bin/env python3
-"""
-Quota-Friendly RAG Evaluation using Local Models
-
-This script evaluates the RAG system using only local Ollama models to avoid API quotas.
-Perfect for testing when you've hit Gemini limits.
-
-Usage:
-    uv run python evaluation_local.py
-"""
-
 import asyncio
 import logging
 from typing import List
 
 from src.data_embedding import get_vector_store_stats, initialize_vector_store
+from src.utils.logging_config import setup_logging
 from src.utils.model_config import get_optimized_config
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

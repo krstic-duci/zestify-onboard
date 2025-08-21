@@ -6,6 +6,9 @@ from typing import List
 from langchain_community.document_loaders import GitLoader
 from langchain_core.documents import Document
 
+from .utils.logging_config import setup_logging
+
+setup_logging()
 logger = logging.getLogger(__name__)
 
 REPO_URL = "https://github.com/krstic-duci/zestify"
@@ -62,7 +65,6 @@ def load_git_repository(clean_existing: bool = False) -> List[Document]:
         return []
 
 
-# NOTE: naive approach as we wanna update specific files as they change
 if __name__ == "__main__":
     repo_path = Path(REPO_PATH)
     if not repo_path.exists():

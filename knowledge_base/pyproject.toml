@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "bs4>=0.0.2",
+    "fastapi[standard]>=0.115.0",
     "gitpython>=3.1.45",
     "google-genai>=1.30.0",
     "langchain>=0.3.27",
@@ -31,20 +32,6 @@ lint.select = ["E", "F", "I", "B"]
 lint.ignore = ["E501"]
 cache-dir = ".ruff_cache"
 exclude = ["src/tmp/"]
-
-[tool.mypy]
-python_version = "3.13"
-ignore_missing_imports = true
-warn_unused_configs = true
-warn_return_any = true
-warn_unused_ignores = true
-cache_dir = ".mypy_cache"
-exclude = ["src/tmp/"]
-disable_error_code = ["import-untyped"]
-
-[[tool.mypy.overrides]]
-module = ["markdownify", "ragas", "ragas.*"]
-ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"

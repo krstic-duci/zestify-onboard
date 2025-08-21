@@ -1,21 +1,4 @@
 #!/usr/bin/env python3
-"""
-RAG System Evaluation Script using Ragas Framework
-
-This script evaluates our RAG system's performance using 10 test questions
-based on the Zestify recipe aggregator codebase. It uses Gemini for both
-the RAG system and evaluation LLM.
-
-Key Features:
-- Tests RAG system with domain-specific questions about Zestify
-- Uses Ragas metrics: Context Recall, Faithfulness, Answer Relevancy
-- Compatible with Google Gemini models for cost-effective evaluation
-- Generates comprehensive evaluation report
-
-Usage:
-    uv run python evaluation.py
-"""
-
 import asyncio
 import logging
 from typing import List
@@ -30,13 +13,10 @@ from ragas.metrics import (  # type: ignore
 )
 
 from src.data_embedding import get_vector_store_stats, initialize_vector_store
+from src.utils.logging_config import setup_logging
 from src.utils.model_config import get_optimized_config
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

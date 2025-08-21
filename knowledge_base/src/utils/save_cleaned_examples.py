@@ -6,6 +6,8 @@ from .logging_config import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
+MAX_EXAMPLES = 500
+
 
 def save_cleaned_examples(chunks: list) -> None:
     """
@@ -22,9 +24,7 @@ def save_cleaned_examples(chunks: list) -> None:
     for existing_file in output_dir.glob("chunk_*.txt"):
         existing_file.unlink()
 
-    # Save a sample of chunks (limit to prevent too many files)
-    max_examples = 50
-    sample_chunks = chunks[:max_examples] if len(chunks) > max_examples else chunks
+    sample_chunks = chunks[:MAX_EXAMPLES] if len(chunks) > MAX_EXAMPLES else chunks
 
     for i, chunk in enumerate(sample_chunks):
         # Create a unique filename for each chunk

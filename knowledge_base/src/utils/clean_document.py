@@ -234,6 +234,18 @@ def clean_python_file(content: str, file_path: str) -> List[Document]:
         # The `visitor.visit(tree)` call starts the traversal, which in turn triggers
         # `visit_ClassDef` and `visit_FunctionDef` methods for relevant nodes.
         visitor.visit(tree)
+        # Step 3.1: Handle cases where we have config files ie if we have Python code
+        # without Class or Function definitions.
+        if not visitor.documents:
+            return [
+                Document(
+                    page_content=content,
+                    metadata={
+                        "source": file_path,
+                        "element_type": "file",
+                    },
+                )
+            ]
         # Step 4: Return the collected documents.
         # The `documents` list in the visitor now contains all the extracted classes and
         # functions.

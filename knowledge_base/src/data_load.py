@@ -58,6 +58,14 @@ def load_git_repository(clean_existing: bool = False) -> List[Document]:
             ),
         )
         data = loader.load()
+        # NOTE: debug lines to check what files exactly are being ingested
+        # sources = [doc.metadata["source"] for doc in data]
+        # unique_sources = sorted(set(sources))
+        # logger.info(
+        #     "Unique sources (%d):\n%s",
+        #     len(unique_sources),
+        #     "\n".join(f"{i + 1}. {s}" for i, s in enumerate(unique_sources)),
+        # )
         logger.info("Successfully loaded %d documents from %s", len(data), REPO_URL)
         return data
     except Exception as e:

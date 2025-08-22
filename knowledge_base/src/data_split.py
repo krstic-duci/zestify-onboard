@@ -43,13 +43,10 @@ def split_documents(documents: List[Document]) -> List[Document]:
         file_suffix = Path(source_path).suffix
 
         try:
-            # Clean document (may return multiple documents for Python files)
             cleaned_docs = clean_document(doc)
 
             for cleaned_doc in cleaned_docs:
-                # Skip splitting for Python elements that are already well-bounded
                 if cleaned_doc.metadata.get("element_type") in ["function", "class"]:
-                    # Add file type metadata and keep as single chunk
                     cleaned_doc.metadata.update(
                         {
                             "file_type": file_suffix.lstrip("."),
@@ -59,17 +56,15 @@ def split_documents(documents: List[Document]) -> List[Document]:
                     all_chunks.append(cleaned_doc)
                     continue
 
-                # Determine which splitter to use for other content
                 if file_suffix == ".py":
                     splitter = python_splitter
                 elif file_suffix == ".js":
                     splitter = js_splitter
-                else:  # Includes .jinja, .html, .md, and other text files
+                else:
                     splitter = general_splitter
 
                 chunks = splitter.split_documents([cleaned_doc])
 
-                # Enrich each chunk with metadata
                 for chunk in chunks:
                     chunk.metadata.update(
                         {
@@ -77,7 +72,6 @@ def split_documents(documents: List[Document]) -> List[Document]:
                             "char_length": len(chunk.page_content),
                         }
                     )
-                    # Preserve existing metadata from cleaning
                     if "element_type" not in chunk.metadata:
                         chunk.metadata["element_type"] = "chunk"
 

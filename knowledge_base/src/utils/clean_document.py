@@ -125,21 +125,17 @@ class PythonCodeVisitor(ast.NodeVisitor):
         Called automatically by `ast.NodeVisitor` when a class definition is encountered.
         This method extracts the class's source code and metadata to create a Document.
         """
-        # Store the current class name to handle nested functions/methods correctly.
         parent_class = self.current_class
         self.current_class = node.name
 
         docstring = ast.get_docstring(node)
         class_source = self._get_source_segment(node)
 
-        # Construct the page_content for the Document, including a header, docstring,
-        # and source code.
         content = f"--- Class: {node.name} ---\n"
         if docstring:
             content += f"Docstring:\n{textwrap.dedent(docstring)}\n"
         content += f"Source Code:\n```python\n{class_source}\n```"
 
-        # Append the newly created Document to the list of documents.
         self.documents.append(
             Document(
                 page_content=content,
@@ -153,10 +149,7 @@ class PythonCodeVisitor(ast.NodeVisitor):
             )
         )
 
-        # Recursively visit child nodes (e.g., methods within this class).
-        # This is crucial for finding functions defined inside the class.
         self.generic_visit(node)
-        # After visiting all children, restore the previous class context.
         self.current_class = parent_class
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
@@ -180,7 +173,6 @@ class PythonCodeVisitor(ast.NodeVisitor):
             content += f"Docstring:\n{textwrap.dedent(docstring)}\n"
         content += f"Source Code:\n```python\n{func_source}\n```"
 
-        # Append the newly created Document to the list of documents.
         self.documents.append(
             Document(
                 page_content=content,
@@ -251,10 +243,6 @@ def clean_python_file(content: str, file_path: str) -> List[Document]:
         # functions.
         return visitor.documents
     except SyntaxError as e:
-        # If the Python code is invalid (e.g., syntax errors), `ast.parse` will raise a
-        # SyntaxError.
-        # In such cases, we cannot perform structured extraction. As a fallback,
-        # we return the entire file content as a single document.
         return [
             Document(
                 page_content=content,
@@ -277,7 +265,6 @@ def clean_html_file(content: str) -> str:
     Returns:
         Cleaned markdown content.
     """
-    # Convert HTML to Markdown
     markdown_content = markdownify(content, strip=["script", "style"]).strip()
 
     # Fix malformed links like <{{ item.link }}>
@@ -299,7 +286,6 @@ def clean_js_file(content: str) -> str:
     Returns:
         Cleaned JavaScript content.
     """
-    # Remove console statements (basic regex - fragile for complex cases)
     content = re.sub(r"console\.\w+\(.*?\);?", "", content)
     content = re.sub(r"\n\s*\n", "\n", content)
     return content.strip()

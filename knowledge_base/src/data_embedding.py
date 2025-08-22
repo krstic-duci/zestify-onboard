@@ -1,7 +1,7 @@
 import hashlib
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -25,7 +25,6 @@ def create_document_id(doc: Document) -> str:
     Returns:
         Unique document ID as a hex string.
     """
-    # Create a hash based on source path, content, and key metadata
     source_path = doc.metadata.get("source", "")
     element_type = doc.metadata.get("element_type", "")
     element_name = doc.metadata.get("element_name", "")
@@ -48,17 +47,14 @@ def initialize_vector_store() -> Chroma:
         Configured Chroma vector store instance.
     """
     try:
-        from .utils.model_config import get_optimized_config
+        from .utils.model_config import hybrid_model_config
 
-        # Get optimized embedding model (local Ollama preferred)
-        config = get_optimized_config()
-        embeddings = config.get_embeddings()
+        model_config = hybrid_model_config()
+        embeddings = model_config.get_embeddings()
 
-        # Create persist directory if it doesn't exist
         persist_dir = Path(CHROMA_PERSIST_DIRECTORY)
         persist_dir.mkdir(exist_ok=True)
 
-        # Initialize Chroma vector store
         vector_store = Chroma(
             collection_name=COLLECTION_NAME,
             embedding_function=embeddings,
@@ -96,7 +92,6 @@ def add_documents_to_store(
         logger.warning("No documents provided to add to vector store.")
         return 0
 
-    # Get initial document count to track what's actually new
     initial_count = vector_store._collection.count()
     logger.info(
         "Starting ingestion: %d documents currently in vector store, attempting to add %d documents",
@@ -104,16 +99,13 @@ def add_documents_to_store(
         len(documents),
     )
 
-    # Enrich documents with embedding model metadata
     enriched_documents = []
     document_ids = []
 
     for doc in documents:
-        # Create unique ID for the document
         doc_id = create_document_id(doc)
         document_ids.append(doc_id)
 
-        # Enrich metadata with embedding information
         enriched_metadata = dict(doc.metadata)
         enriched_metadata.update(
             {
@@ -123,7 +115,6 @@ def add_documents_to_store(
             }
         )
 
-        # Create new document with enriched metadata
         enriched_doc = Document(
             page_content=doc.page_content,
             metadata=enriched_metadata,
@@ -132,13 +123,11 @@ def add_documents_to_store(
 
     added_count = 0
 
-    # Process documents in batches to avoid memory issues
     for i in range(0, len(enriched_documents), batch_size):
         batch_docs = enriched_documents[i : i + batch_size]
         batch_ids = document_ids[i : i + batch_size]
 
         try:
-            # Add documents with IDs to prevent duplicates
             vector_store.add_documents(
                 documents=batch_docs,
                 ids=batch_ids,
@@ -160,10 +149,8 @@ def add_documents_to_store(
                 e,
                 exc_info=True,
             )
-            # Continue with next batch instead of failing completely
             continue
 
-    # Get final count to see what actually changed
     final_count = vector_store._collection.count()
     net_added = final_count - initial_count
 
@@ -197,11 +184,9 @@ def get_vector_store_stats(vector_store: Chroma) -> dict:
         Dictionary containing vector store statistics.
     """
     try:
-        # Get collection info
         collection = vector_store._collection
         count = collection.count()
 
-        # Get sample of metadata to understand document types
         if count > 0:
             sample_results = collection.peek(limit=min(50, count))
             file_types = set()
@@ -244,35 +229,3 @@ def get_vector_store_stats(vector_store: Chroma) -> dict:
             "persist_directory": CHROMA_PERSIST_DIRECTORY,
             "error": str(e),
         }
-
-
-def clear_vector_store(vector_store: Optional[Chroma] = None) -> bool:
-    """
-    Clear all documents from the vector store.
-
-    Args:
-        vector_store: Optional Chroma vector store instance. If None, creates a new one.
-
-    Returns:
-        True if successful, False otherwise.
-    """
-    try:
-        if vector_store is None:
-            vector_store = initialize_vector_store()
-
-        # Get all document IDs and delete them
-        collection = vector_store._collection
-        count_before = collection.count()
-
-        if count_before > 0:
-            # Delete all documents
-            collection.delete()
-            logger.info("Cleared %d documents from vector store", count_before)
-        else:
-            logger.info("Vector store was already empty")
-
-        return True
-
-    except Exception as e:
-        logger.error("Error clearing vector store: %s", e, exc_info=True)
-        return False

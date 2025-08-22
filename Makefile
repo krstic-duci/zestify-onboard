@@ -1,33 +1,26 @@
 PY_DIR=knowledge_base
 JS_DIR=interface
 
-.PHONY: setup dev lint format test clean kb if api api-prod
+.PHONY: setup lint format test clean api-dev dev-full
 
 setup:
 	cd $(PY_DIR) && uv sync --frozen
 	cd $(JS_DIR) && pnpm install
 
-dev:
-	cd $(PY_DIR) && uv run main.py
-
-# API server options (choose one)
-api:
-	cd $(PY_DIR) && uv run fastapi dev src/api_server.py
-
-api-prod:
-	cd $(PY_DIR) && uv run fastapi run src/api_server.py
+api-dev:
+	cd $(PY_DIR) && uv run fastapi dev api_server.py
 
 dev-frontend:
 	cd $(JS_DIR) && pnpm dev
 
 dev-full: 
 	@echo "Starting RAG API server..."
-	cd $(PY_DIR) && uv run fastapi dev src/api_server.py &
+	cd $(PY_DIR) && uv run fastapi dev api_server.py &
 	@echo "Starting Next.js frontend..."
 	cd $(JS_DIR) && pnpm dev
 
 ingest:
-	cd $(PY_DIR) && uv run main.py
+	cd $(PY_DIR) && uv run ingest.py
 
 lint:
 	cd $(PY_DIR) && uv run ruff check .
@@ -44,9 +37,3 @@ test:
 clean:
 	cd $(PY_DIR) && rm -rf .mypy_cache .pytest_cache
 	cd $(JS_DIR) && rm -rf .next
-
-kb:
-	cd $(PY_DIR)/src
-
-if:
-	cd $(JS_DIR)

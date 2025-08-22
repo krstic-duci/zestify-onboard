@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 import logging
 from typing import Any, Dict, List
 
 from langchain_chroma import Chroma
 
-from ..data_embedding import initialize_vector_store
-from ..utils.logging_config import setup_logging
+from src.data_embedding import initialize_vector_store
+from src.utils.logging_config import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -29,7 +30,6 @@ def get_collection_sample(vector_store: Chroma, limit: int = 2) -> Dict[str, Lis
             logger.info("The collection is empty.")
             return {}
 
-        # Retrieve a sample of the collection data
         sample = collection.peek(limit=min(limit, count))
         return sample  # type: ignore
 
@@ -60,7 +60,6 @@ def print_sample_records(sample: Dict[str, List[Any]]) -> None:
         print(f"--- Record {i + 1} ---")
         print(f"  ID: {doc_id}")
 
-        # Print metadata
         if metadatas and len(metadatas) > i:
             metadata = metadatas[i]
             if metadata:
@@ -68,12 +67,10 @@ def print_sample_records(sample: Dict[str, List[Any]]) -> None:
                 for key, value in metadata.items():
                     print(f"    {key}: {value}")
 
-        # Print document content (chunk text)
         if documents and len(documents) > i:
             document = documents[i]
             print(f"  Chunk Text:\n'''{document}'''")
 
-        # Print embedding vector (first 10 elements for brevity)
         if embeddings is not None and len(embeddings) > i:
             embedding = embeddings[i]
             if embedding is not None:

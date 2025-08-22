@@ -13,14 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class ModelConfig:
-    """
-    Hybrid model configuration optimized for different hardware setups.
-
-    Strategy:
-    - Embeddings: Local Ollama (no API quota, good quality, runs well on 16GB RAM)
-    - LLM: Gemini API (better quality than small local models, handles quota limits)
-    """
-
     def __init__(
         self,
         use_local_embeddings: bool = True,
@@ -30,7 +22,7 @@ class ModelConfig:
         Initialize model configuration.
 
         Args:
-            use_local_embeddings: Whether to use local Ollama embeddings (recommended)
+            use_local_embeddings: Whether to use local Ollama embeddings
             embedding_model: Ollama embedding model to use
         """
         self.use_local_embeddings = use_local_embeddings
@@ -42,20 +34,13 @@ class ModelConfig:
         self.gemini_api_key: str = gemini_api_key
 
     def get_embeddings(self):
-        """
-
-        Returns:
-            Configured embeddings model
-        """
         if self.use_local_embeddings:
-            logger.info(f"Using local Ollama embeddings: {self.embedding_model}")
             return OllamaEmbeddings(
                 model=self.embedding_model,
-                # Optimize for i5
                 num_thread=2,
             )
         else:
-            # Fallback to Gemini (uses API quota)
+            # Fallback to Gemini
             from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
             logger.info("Using Gemini API embeddings")
@@ -64,17 +49,16 @@ class ModelConfig:
                 google_api_key=SecretStr(self.gemini_api_key),
             )
 
-    def get_llm(self, model: str = "gemini-1.5-flash"):
+    def get_gemini_llm(self, model: str = "gemini-1.5-flash"):
         """
-        Get LLM for generation (Gemini API recommended for quality).
+        Get Gemini LLM for generation.
 
         Args:
             model: Gemini model to use
 
         Returns:
-            Configured LLM
+            Configured Gemini LLM
         """
-        logger.info(f"Using Gemini API LLM: {model}")
         return ChatGoogleGenerativeAI(
             model=model,
             google_api_key=SecretStr(self.gemini_api_key),
@@ -82,7 +66,7 @@ class ModelConfig:
 
     def get_local_llm(self, model: str = "llama3.2:3b"):
         """
-        Get local Ollama LLM (for testing only - will be slow on your hardware).
+        Get local Ollama LLM.
 
         Args:
             model: Ollama model to use
@@ -92,61 +76,49 @@ class ModelConfig:
         """
         from langchain_ollama import OllamaLLM
 
-        logger.warning(
-            f"Using local Ollama LLM: {model} (will be slow on dual-core i5)"
-        )
+        logger.warning(f"Using local Ollama LLM: {model}")
         return OllamaLLM(
             model=model,
-            num_thread=2,  # Optimize for your dual-core
+            num_thread=2,
         )
 
     def test_models(self):
-        """Test that both embedding and LLM models are working."""
         logger.info("Testing model configuration...")
 
         try:
-            # Test embeddings
             embeddings = self.get_embeddings()
             test_embedding = embeddings.embed_query("test query")
-            logger.info(f"✅ Embeddings working (dimension: {len(test_embedding)})")
+            logger.info(f"Embeddings working (dimension: {len(test_embedding)})")
 
-            # Test LLM
-            llm = self.get_llm()
+            llm = self.get_gemini_llm()
             response = llm.invoke("Say 'Hello, models are working!'")
-            logger.info(f"✅ LLM working: {response.content[:50]}...")
+            logger.info(f"LLM working: {response.content[:50]}...")
 
             return True
 
         except Exception as e:
-            logger.error(f"❌ Model test failed: {e}")
+            logger.error(f"Model test failed: {e}")
             return False
 
 
-def get_optimized_config() -> ModelConfig:
+def hybrid_model_config() -> ModelConfig:
     """
-    Get optimized model configuration for current hardware.
+    Get Ollama embeddings and Gemini 1.5 flash for LLM.
 
     Returns:
-        ModelConfig instance optimized for the system
+        ModelConfig instance.
     """
-    # For dual-core i5 with 16GB RAM, prefer local embeddings + remote LLM
-    return ModelConfig(
-        use_local_embeddings=True,
-        embedding_model="nomic-embed-text",  # Start with lighter model
-    )
+    return ModelConfig()
 
 
 if __name__ == "__main__":
-    # Test the configuration
-    logging.basicConfig(level=logging.INFO)
-
-    config = get_optimized_config()
-    success = config.test_models()
+    model_config = hybrid_model_config()
+    success = model_config.test_models()
 
     if success:
-        print("\n🎉 Hybrid model configuration is working!")
-        print("💡 Using local Ollama for embeddings (no API quota)")
-        print("🌐 Using Gemini API for LLM generation (better quality)")
+        print("Hybrid model configuration is working!")
+        print("Using local Ollama for embeddings")
+        print("Using Gemini API for LLM generation")
     else:
-        print("\n❌ Model configuration test failed")
+        print("Model configuration test failed")
         print("Check that Ollama is running and Gemini API key is set")

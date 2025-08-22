@@ -1,7 +1,7 @@
 from typing import Dict, List, TypedDict
 
 from bs4.filter import SoupStrainer
-from knowledge_base.src.utils.model_config import get_optimized_config
+from knowledge_base.src.utils.model_config import hybrid_model_config
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_core.documents import Document
@@ -10,11 +10,11 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # https://python.langchain.com/docs/tutorials/chatbot/
 # https://python.langchain.com/docs/tutorials/rag/
 # https://python.langchain.com/docs/tutorials/qa_chat_history/
-config = get_optimized_config()
-llm = config.get_llm()
-print(llm.invoke("What's the capital of France?"))
+model_config = hybrid_model_config()
+gemini_llm = model_config.get_gemini_llm()
+print(gemini_llm.invoke("What's the capital of France?"))
 
-embeddings = config.get_embeddings()
+embeddings = model_config.get_embeddings()
 
 
 loader = WebBaseLoader(
@@ -77,7 +77,7 @@ def retrieve(state: State):
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = prompt.invoke({"question": state["question"], "context": docs_content})
-    response = llm.invoke(messages)
+    response = gemini_llm.invoke(messages)
     return {"answer": response.content}
 
 
@@ -498,14 +498,6 @@ state["answer"] = answer
 #        `collection_name`, and `persist_directory`. On error returns a dict
 #        with `error` and empty/default fields.
 #
-#    - `clear_vector_store(vector_store: Optional[Chroma] = None) -> bool`:
-#      * Inputs: optional Chroma instance (if omitted the function calls
-#        `initialize_vector_store`).
-#      * Behavior: counts documents and calls `collection.delete()` to wipe the
-#        store when non-empty. Returns True on success, False on failure.
-#      * Notes: helpful for tests, development, or rebuilding the index from
-#        scratch.
-#
 # 3) Example:
 #
 # method: data_embedding > "initialize_vector_store" + "add_documents_to_store"
@@ -619,10 +611,3 @@ state["answer"] = answer
 #      call Chroma internals (count/peek/delete). That relies on the specific
 #      Chroma client used; if you swap vector backends you will need to adapt
 #      these calls.
-#
-# 5) Why this module exists:
-#    - Keeps embedding and persistence logic in one place so the rest of the
-#      ingestion pipeline (`clean_document`, `data_split`) can remain focused
-#      on producing high-quality Document objects. This module handles the
-#      idempotency, batching, and simple diagnostics needed to keep a local
-#      Chroma index healthy and debuggable.
